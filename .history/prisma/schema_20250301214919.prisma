@@ -1,0 +1,27 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Classroom {
+  id        Int      @id @default(autoincrement())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  schedules Schedule[]
+}
+
+model Schedule {
+  id             Int      @id @default(autoincrement())
+  classroomId    Int
+  startTime      DateTime
+  endTime        DateTime
+  recurringWeekly Boolean @default(false)
+  description    String?   // Make sure this line exists
+  classroom      Classroom @relation(fields: [classroomId], references: [id])
+}
+
