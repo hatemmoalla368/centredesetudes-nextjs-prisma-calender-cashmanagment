@@ -4,7 +4,7 @@
 import dynamic from 'next/dynamic';
 
 // Disable SSR for InvoiceForm
-const ReceiptForm = dynamic(() => import('../../../components/ReceiptForm'), { ssr: false });
+const InvoiceForm = dynamic(() => import('../components/InvoiceForm'), { ssr: false });
 
 
 export default function NewReceipt() {
