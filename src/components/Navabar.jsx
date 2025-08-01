@@ -4,6 +4,7 @@ import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import NavDropdown from 'react-bootstrap/NavDropdown';
 import Link from "next/link";
+<<<<<<< HEAD
 
 function Navabar() {
   return (
@@ -13,6 +14,24 @@ function Navabar() {
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">
+=======
+import { useAuth } from '@/contexts/AuthContext';
+import { Button } from 'react-bootstrap';
+
+function Navabar() {
+    const { isAuthenticated, logout } = useAuth();
+
+  return (
+    <Navbar expand="lg" className="bg-body-tertiary">
+      <Container>
+<Navbar.Brand as={Link} href={isAuthenticated ? '/' : '/login'}>
+          EduSpace Coworking
+        </Navbar.Brand>        <Navbar.Toggle aria-controls="basic-navbar-nav" />
+        <Navbar.Collapse id="basic-navbar-nav">
+          <Nav className="me-auto">
+             {isAuthenticated && (
+              <>
+>>>>>>> ef74eb1 (Initial commit with Next.js coworking space management app)
             <Nav.Link as={Link} href="/">dashboard</Nav.Link>
             
             <NavDropdown title="calender" id="basic-nav-dropdown">
@@ -32,6 +51,7 @@ function Navabar() {
               
               
             </NavDropdown>
+<<<<<<< HEAD
 
           </Nav>
         </Navbar.Collapse>
@@ -40,4 +60,39 @@ function Navabar() {
   );
 }
 
+=======
+            <NavDropdown title="factures" id="basic-nav-dropdown">
+              <NavDropdown.Item as={Link} href="/factures">factures list</NavDropdown.Item>
+              <NavDropdown.Item as={Link} href="/factures/new">new facture</NavDropdown.Item>
+              
+
+              
+              
+            </NavDropdown>
+             <NavDropdown title="recu de paiement" id="basic-nav-dropdown">
+              <NavDropdown.Item as={Link} href="/recus">recu de paiement list</NavDropdown.Item>
+              <NavDropdown.Item as={Link} href="/recus/new">new recu</NavDropdown.Item>
+              
+
+              
+              
+            </NavDropdown>
+            </>
+             )}
+              {isAuthenticated && (
+            <Button variant="outline-danger" onClick={logout}>
+              Déconnexion
+            </Button>
+          )}
+          </Nav>
+        </Navbar.Collapse>
+         
+       
+      </Container>
+    </Navbar>
+  )
+}
+
+
+>>>>>>> ef74eb1 (Initial commit with Next.js coworking space management app)
 export default Navabar;

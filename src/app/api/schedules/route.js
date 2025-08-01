@@ -1,10 +1,19 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
+<<<<<<< HEAD
+=======
+import { authMiddleware } from "@/lib/auth";
+>>>>>>> ef74eb1 (Initial commit with Next.js coworking space management app)
 
 const prisma = new PrismaClient();
 
 // Handle GET request (Fetch all schedules)
+<<<<<<< HEAD
 export async function GET() {
+=======
+export const GET = authMiddleware (async(request, { params })=> {
+
+>>>>>>> ef74eb1 (Initial commit with Next.js coworking space management app)
   try {
     const schedules = await prisma.schedule.findMany({
       include: { classroom: true, teacher:true },
@@ -13,12 +22,21 @@ export async function GET() {
   } catch (error) {
     return NextResponse.json({ error: "Failed to fetch schedules" }, { status: 500 });
   }
+<<<<<<< HEAD
 }
+=======
+})
+>>>>>>> ef74eb1 (Initial commit with Next.js coworking space management app)
 
 // Handle POST request (Add a new schedule)
 
 
+<<<<<<< HEAD
 export async function POST(req) {
+=======
+export const POST = authMiddleware (async(req, { params })=> {
+
+>>>>>>> ef74eb1 (Initial commit with Next.js coworking space management app)
   try {
     const { schedules } = await req.json();
 
@@ -44,4 +62,8 @@ export async function POST(req) {
     console.error("Error creating schedules:", error);
     return NextResponse.json({ error: "Failed to create schedules." }, { status: 500 });
   }
+<<<<<<< HEAD
 }
+=======
+})
+>>>>>>> ef74eb1 (Initial commit with Next.js coworking space management app)

@@ -5,8 +5,29 @@ import Button from "react-bootstrap/Button";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+<<<<<<< HEAD
 
 const AdminDashboard = () => {
+=======
+import EditIcon from "@mui/icons-material/Edit";
+import Modal from "react-bootstrap/Modal";
+import { useAuth } from "@/contexts/AuthContext";
+import { useRouter } from 'next/navigation';
+import { Container, Spinner } from "react-bootstrap";
+import ProtectedRoute from "./ProtectedRoute";
+const AdminDashboard = () => {
+  const router = useRouter();
+  const [showEditModal, setShowEditModal] = useState(false);
+const [editingSchedule, setEditingSchedule] = useState({
+  id: "",
+  classroomId: "",
+  startTime: "",
+  endTime: "",
+  description: "",
+  recurringWeekly: false,
+  teacherId: "",
+});
+>>>>>>> ef74eb1 (Initial commit with Next.js coworking space management app)
   const [schedules, setSchedules] = useState([]);
   const [pagination, setPagination] = useState({
     pageIndex: 0, // Initial page index
@@ -23,6 +44,12 @@ const AdminDashboard = () => {
     recurringWeekly: false,
     teacherId: "",
   });
+<<<<<<< HEAD
+=======
+const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+>>>>>>> ef74eb1 (Initial commit with Next.js coworking space management app)
 
   useEffect(() => {
     fetchSchedules();
@@ -192,6 +219,81 @@ const AdminDashboard = () => {
     }
   };
 
+<<<<<<< HEAD
+=======
+const handleEditClick = (schedule) => {
+  const dateToLocalInput = (dateString) => {
+    const date = new Date(dateString);
+    // Format for datetime-local input (YYYY-MM-DDTHH:MM)
+    return `${date.getFullYear()}-${(date.getMonth()+1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}T${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+  };
+
+  setEditingSchedule({
+    ...schedule,
+    startTime: dateToLocalInput(schedule.startTime),
+    endTime: dateToLocalInput(schedule.endTime)
+  });
+  setShowEditModal(true);
+};
+
+const handleEditChange = (e) => {
+  const { name, value, type, checked } = e.target;
+  setEditingSchedule({
+    ...editingSchedule,
+    [name]: type === "checkbox" ? checked : value,
+  });
+};
+
+const handleUpdateSchedule = async (e) => {
+  e.preventDefault();
+  try {
+    const { classroomId, startTime, endTime } = editingSchedule;
+
+    // Validate that endTime is after startTime
+    if (new Date(endTime) <= new Date(startTime)) {
+      throw new Error("End time must be after start time.");
+    }
+
+    // Check for conflicts (excluding the current schedule)
+    const conflictResponse = await fetch("/api/schedules/check-conflict", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        classroomId,
+        startTime,
+        endTime,
+        excludeScheduleId: editingSchedule.id,
+      }),
+    });
+
+    if (!conflictResponse.ok) {
+      const conflictData = await conflictResponse.json();
+      throw new Error(conflictData.error || "Classroom is already booked at the requested time.");
+    }
+
+    const response = await fetch(`/api/schedules/${editingSchedule.id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(editingSchedule),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to update schedule.");
+    }
+
+    fetchSchedules();
+    setShowEditModal(false);
+    toast.success("Schedule updated successfully!");
+  } catch (error) {
+    toast.error(error.message);
+  }
+};
+
+>>>>>>> ef74eb1 (Initial commit with Next.js coworking space management app)
   const columns = useMemo(
     () => [
       {
@@ -204,7 +306,11 @@ const AdminDashboard = () => {
         header: "teacher",
         size: 100,
       },
+<<<<<<< HEAD
       {
+=======
+   {
+>>>>>>> ef74eb1 (Initial commit with Next.js coworking space management app)
         accessorKey: "startTime", // Assuming startTime is in ISO format
         header: "Start Time",
         size: 100,
@@ -216,11 +322,16 @@ const AdminDashboard = () => {
         size: 100,
         Cell: ({ cell }) => new Date(cell.row.original.endTime).toLocaleString(),
       },
+<<<<<<< HEAD
+=======
+ 
+>>>>>>> ef74eb1 (Initial commit with Next.js coworking space management app)
       {
         accessorKey: "description",
         header: "Description",
         size: 200,
       },
+<<<<<<< HEAD
       {
         accessorKey: "id", // This is where we define the Actions column
         header: "Actions",
@@ -242,6 +353,41 @@ const AdminDashboard = () => {
     ],
     []
   );
+=======
+       {
+      accessorKey: "id",
+      header: "Actions",
+      size: 100,
+      Cell: ({ cell }) => (
+        <div className="d-flex gap-2">
+          <Button
+            onClick={() => handleEditClick(cell.row.original)}
+            variant="contained"
+            color="primary"
+            size="small"
+            className="text-primary btn-link edit"
+          >
+            <EditIcon />
+          </Button>
+          <Button
+            onClick={() => handleDelete(cell.row.original.id)}
+            variant="contained"
+            color="secondary"
+            size="small"
+            className="text-danger btn-link delete"
+          >
+            <DeleteForeverIcon />
+          </Button>
+        </div>
+      ),
+    },
+    ],
+    []
+  );
+ 
+
+  
+>>>>>>> ef74eb1 (Initial commit with Next.js coworking space management app)
   return (
     <div className="container">
       <h1>Admin Dashboard</h1>
@@ -355,6 +501,102 @@ const AdminDashboard = () => {
         state={{ pagination: pagination }} // Ensure controlled pagination state
         manualPagination={false} // Ensure the table handles pagination internally
       />
+<<<<<<< HEAD
+=======
+      {/* Edit Schedule Modal */}
+<Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
+  <Modal.Header closeButton>
+    <Modal.Title>Edit Schedule</Modal.Title>
+  </Modal.Header>
+  <Modal.Body>
+    <form onSubmit={handleUpdateSchedule}>
+      <div className="mb-3">
+        <label htmlFor="classroomId" className="form-label">Classroom</label>
+        <select
+          className="form-select"
+          name="classroomId"
+          value={editingSchedule.classroomId}
+          onChange={handleEditChange}
+          required
+        >
+          <option value="">Select a Classroom</option>
+          {classrooms.map((classroom) => (
+            <option key={classroom.id} value={classroom.id}>
+              {classroom.name}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div className="mb-3">
+        <label htmlFor="teacherId" className="form-label">Teacher</label>
+        <select
+          className="form-select"
+          name="teacherId"
+          value={editingSchedule.teacherId}
+          onChange={handleEditChange}
+          required
+        >
+          <option value="">Select a Teacher</option>
+          {teachers.map((teacher) => (
+            <option key={teacher.id} value={teacher.id}>
+              {teacher.name}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div className="mb-3">
+        <label htmlFor="startTime" className="form-label">Start Time</label>
+        <input
+  type="datetime-local"
+  name="startTime"
+  value={editingSchedule.startTime}
+  onChange={handleEditChange}
+  required
+    step="900" // 15-minute intervals
+
+/>
+      </div>
+      <div className="mb-3">
+        <label htmlFor="endTime" className="form-label">End Time</label>
+        <input
+  type="datetime-local"
+  name="endTime"
+  value={editingSchedule.endTime}
+  onChange={handleEditChange}
+  required
+    step="900" // 15-minute intervals
+
+/>
+      </div>
+      <div className="mb-3">
+        <label htmlFor="description" className="form-label">Description</label>
+        <textarea
+          className="form-control"
+          name="description"
+          value={editingSchedule.description}
+          onChange={handleEditChange}
+          required
+        ></textarea>
+      </div>
+      <div className="form-check mb-3">
+        <input
+          type="checkbox"
+          className="form-check-input"
+          name="recurringWeekly"
+          checked={editingSchedule.recurringWeekly}
+          onChange={handleEditChange}
+        />
+        <label className="form-check-label" htmlFor="recurringWeekly">
+          Recurring Weekly
+        </label>
+      </div>
+      <button type="submit" className="btn btn-primary">
+        Update Schedule
+      </button>
+    </form>
+  </Modal.Body>
+</Modal>
+>>>>>>> ef74eb1 (Initial commit with Next.js coworking space management app)
 
       {/* Toast Notifications */}
       <ToastContainer />
@@ -362,4 +604,8 @@ const AdminDashboard = () => {
   );
 };
 
+<<<<<<< HEAD
 export default AdminDashboard;
+=======
+export default ProtectedRoute(AdminDashboard);
+>>>>>>> ef74eb1 (Initial commit with Next.js coworking space management app)

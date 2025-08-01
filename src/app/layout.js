@@ -3,7 +3,13 @@ import { Geist, Geist_Mono } from "next/font/google";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { ToastContainer } from 'react-toastify';
 import Navabar from "@/components/Navabar";
+<<<<<<< HEAD
 
+=======
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'react-toastify/dist/ReactToastify.css';
+import { AuthProvider } from "@/contexts/AuthContext";
+>>>>>>> ef74eb1 (Initial commit with Next.js coworking space management app)
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,12 +29,30 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
+<<<<<<< HEAD
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ToastContainer />
         <Navabar/>
         {children}
+=======
+      <head>
+        <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+        />
+      </head>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
+        <AuthProvider>
+        <Navabar/>
+        {children}
+                <ToastContainer />
+                </AuthProvider>
+
+>>>>>>> ef74eb1 (Initial commit with Next.js coworking space management app)
       </body>
     </html>
   );

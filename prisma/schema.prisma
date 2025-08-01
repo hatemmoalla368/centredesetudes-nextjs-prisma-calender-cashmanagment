@@ -13,8 +13,41 @@ model Teacher {
   email     String     @unique
   phone     String?
   schedules Schedule[] // One-to-many
+<<<<<<< HEAD
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
+=======
+  groups    Group[]  // One teacher can have multiple groups
+   transactions Transaction[] // Add this line
+
+
+  createdAt DateTime   @default(now())
+  updatedAt DateTime @updatedAt @default(now())
+}
+
+model Group {
+  id         Int       @id @default(autoincrement())
+  name       String
+  teacher    Teacher   @relation(fields: [teacherId], references: [id])
+  teacherId  Int
+  students   Student[]
+  transactions Transaction[]
+  createdAt  DateTime  @default(now())
+  updatedAt DateTime @updatedAt @default(now())
+}
+
+model Student {
+  id        Int       @id @default(autoincrement())
+  name      String
+  phone     String
+  group     Group     @relation(fields: [groupId], references: [id])
+ 
+  transactions Transaction[] // Add this line
+
+  groupId   Int
+  createdAt DateTime  @default(now())
+  updatedAt DateTime @updatedAt @default(now())
+>>>>>>> ef74eb1 (Initial commit with Next.js coworking space management app)
 }
 
 model Classroom {
@@ -36,6 +69,7 @@ model Schedule {
 
   classroom Classroom @relation(fields: [classroomId], references: [id])
   teacher   Teacher?  @relation(fields: [teacherId], references: [id])
+<<<<<<< HEAD
 }
 
 model Transaction {
@@ -46,3 +80,82 @@ model Transaction {
   category    String   // e.g., "sales", "rent", "salaries"
   date        DateTime @default(now())
 }
+=======
+     invoiced Boolean @default(false) 
+invoice Invoice? @relation(fields: [invoiceId], references: [id]) 
+   invoiceId Int? 
+   }
+
+
+
+   
+
+model Transaction {
+  id          Int      @id @default(autoincrement())
+  type        String   // "income", "expense", "receivable", "payable"
+  amount      Float
+  description String
+  category    String   // "salary", "taxes", "classroom_rent", "student_payment", "teacher_share"
+  status      String   // "completed", "pending"
+  date        DateTime @default(now())
+  
+  // Relations
+  teacherId   Int?
+  teacher     Teacher? @relation(fields: [teacherId], references: [id])
+  
+  studentId   Int?
+  student     Student? @relation(fields: [studentId], references: [id])
+  
+  groupId     Int?
+  group       Group?   @relation(fields: [groupId], references: [id])
+  hasReceipt  Boolean   @default(false)
+  receipt     Receipt?  @relation("TransactionReceipt")
+}
+model Invoice {
+  id          Int      @id @default(autoincrement())
+  clientName  String
+  clientAddress String
+  invoiceNumber String @unique
+  date        DateTime
+  taxRate     Float
+  items       Json     // Stores invoice items as JSON
+  total       Float
+  taxAmount   Float
+  grandTotal  Float
+  timbreFiscal Float?   // Add this line (make it optional with ? if needed)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+schedules Schedule[]
+  // Company info (redundant storage for archival)
+  companyName String   @default("EduSpace Coworking")
+  companyLogo String   @default("/logo.png")
+  companyAddress String @default("24 Rue de l'Éducation, Tunis 1002")
+  companyPhone String  @default("+216 70 123 456")
+  companyEmail String  @default("contact@eduspace.tn")
+  matriculeFiscale String @default("MF12345678")
+}
+model Receipt {
+  id                Int      @id @default(autoincrement())
+  payerName         String
+  payerAddress      String
+  receiptNumber     String   @unique
+  paymentDate       DateTime
+  amount            Float
+  amountInWords     String
+  paymentDescription String
+  paymentMethod     Json     // { type: "Espèces" | "Chèque" | "Virement Bancaire" | "Autre", chequeNumber?: String, bank?: String, transactionNumber?: String, otherDetails?: String }
+  place             String
+  transactionId     Int?       @unique
+  transaction       Transaction? @relation("TransactionReceipt", fields: [transactionId], references: [id])
+
+  companyName       String   @default("EduSpace Coworking")
+  companyLogo       String   @default("/logo.png")
+  companyAddress    String   @default("24 Rue de l'Éducation, Tunis 1002")
+  companyPhone      String   @default("+216 70 123 456")
+  companyEmail      String   @default("contact@eduspace.tn")
+  matriculeFiscale  String   @default("MF12345678")
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+  
+>>>>>>> ef74eb1 (Initial commit with Next.js coworking space management app)

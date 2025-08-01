@@ -3,12 +3,24 @@ import React, { useEffect, useState } from "react";
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
+<<<<<<< HEAD
+=======
+import { useAuth } from "@/contexts/AuthContext";
+import { useRouter } from 'next/navigation';
+>>>>>>> ef74eb1 (Initial commit with Next.js coworking space management app)
 
 // Setup the localizer using moment
 const localizer = momentLocalizer(moment);
 
 const ClassroomCalendar = ({ classroomId }) => {
+<<<<<<< HEAD
   const [schedules, setSchedules] = useState([]);
+=======
+  const router = useRouter();
+  const [schedules, setSchedules] = useState([]);
+const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+>>>>>>> ef74eb1 (Initial commit with Next.js coworking space management app)
 
   // Fetch schedules for the specific classroom
   useEffect(() => {
@@ -58,6 +70,13 @@ const ClassroomCalendar = ({ classroomId }) => {
       </div>
     );
   };
+<<<<<<< HEAD
+=======
+  
+
+
+
+>>>>>>> ef74eb1 (Initial commit with Next.js coworking space management app)
 console.log("schedules", schedules)
   return (
     <div style={{ height: "500px" }}>
