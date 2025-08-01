@@ -1,6 +1,25 @@
-
 "use client"
 import React, { useEffect, useMemo, useState } from "react";
+<<<<<<< HEAD
+import { Card, Table, Alert, Spinner } from "react-bootstrap";
+import { useRouter } from "next/navigation";
+import { MaterialReactTable } from 'material-react-table';
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import Button from 'react-bootstrap/Button';
+
+const TeacherProfile = ({ teacherId }) => {
+    const [pagination, setPagination] = useState({
+        pageIndex: 0, // Initial page index
+        pageSize: 10, // Initial page size
+      });
+  const [teacher, setTeacher] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const router = useRouter();
+  const fetchTeacherProfile = async () => {
+    try {
+      const response = await fetch(`/api/teachers/${teacherId}`);
+=======
 import { Card, Alert, Spinner, Modal, Button as BootstrapButton, ListGroup } from "react-bootstrap";
 import { useRouter } from "next/navigation";
 import { MaterialReactTable } from 'material-react-table';
@@ -110,6 +129,7 @@ const [selectedGroup, setSelectedGroup] = useState(null);
   const fetchTeacherProfile = async () => {
     try {
       const response = await fetch(`/api/teachers/${teacherId}?includeGroups=true`);
+>>>>>>> ef74eb1 (Initial commit with Next.js coworking space management app)
       if (!response.ok) throw new Error("Failed to fetch profile");
       const data = await response.json();
       setTeacher(data);
@@ -120,6 +140,16 @@ const [selectedGroup, setSelectedGroup] = useState(null);
       setLoading(false);
     }
   };
+<<<<<<< HEAD
+ 
+  useEffect(() => {
+    
+
+    if (teacherId) {
+      fetchTeacherProfile();
+    }
+  }, [teacherId]);
+=======
 
   useEffect(() => {
     if (teacherId) {
@@ -129,6 +159,7 @@ const [selectedGroup, setSelectedGroup] = useState(null);
     fetchTeachers();
   }, [teacherId]);
 
+>>>>>>> ef74eb1 (Initial commit with Next.js coworking space management app)
   const handleDelete = async (id) => {
     try {
       const response = await fetch(`/api/schedules/${id}`, {
@@ -143,6 +174,12 @@ const [selectedGroup, setSelectedGroup] = useState(null);
       console.error("Error deleting schedule:", error);
     }
   };
+<<<<<<< HEAD
+  const columns = useMemo(
+    () => [
+      {
+        accessorKey: "classroom.name", // Access nested property classroom.name
+=======
   const fetchClassrooms = async () => {
     try {
       const response = await fetch("/api/classrooms");
@@ -237,10 +274,20 @@ const handleUpdateSchedule = async (e) => {
     () => [
       {
         accessorKey: "classroom.name",
+>>>>>>> ef74eb1 (Initial commit with Next.js coworking space management app)
         header: "Classroom",
         size: 100,
       },
       {
+<<<<<<< HEAD
+        accessorKey: "startTime", // Assuming startTime is in ISO format
+        header: "Start Time",
+        size: 100,
+        Cell: ({ cell }) => new Date(cell.row.original.startTime).toLocaleString(), // Format the date
+      },
+      {
+        accessorKey: "endTime", // Assuming endTime is in ISO format
+=======
         accessorKey: "startTime",
         header: "Start Time",
         size: 100,
@@ -248,6 +295,7 @@ const handleUpdateSchedule = async (e) => {
       },
       {
         accessorKey: "endTime",
+>>>>>>> ef74eb1 (Initial commit with Next.js coworking space management app)
         header: "End Time",
         size: 100,
         Cell: ({ cell }) => new Date(cell.row.original.endTime).toLocaleString(),
@@ -258,6 +306,13 @@ const handleUpdateSchedule = async (e) => {
         size: 200,
       },
       {
+<<<<<<< HEAD
+        accessorKey: "id", // This is where we define the Actions column
+        header: "Actions",
+        size: 100,
+        Cell: ({ cell }) => (
+          <div>
+=======
         accessorKey: "id",
         header: "Actions",
         size: 100,
@@ -272,6 +327,7 @@ const handleUpdateSchedule = async (e) => {
           >
             <EditIcon />
           </Button>
+>>>>>>> ef74eb1 (Initial commit with Next.js coworking space management app)
             <Button
               onClick={() => handleDelete(cell.row.original.id)}
               variant="contained"
@@ -287,7 +343,10 @@ const handleUpdateSchedule = async (e) => {
     ],
     []
   );
+<<<<<<< HEAD
+=======
 
+>>>>>>> ef74eb1 (Initial commit with Next.js coworking space management app)
   if (loading) {
     return <Spinner animation="border" />;
   }
@@ -299,6 +358,44 @@ const handleUpdateSchedule = async (e) => {
   if (!teacher) {
     return <Alert variant="warning">Teacher not found.</Alert>;
   }
+<<<<<<< HEAD
+  console.log("teacher", teacher)
+  return (
+    <div>
+    <Card>
+      <Card.Body>
+        <Card.Title>Teacher Profile</Card.Title>
+        <Card.Text>
+          <strong>Name:</strong> {teacher.name}
+          <br />
+          <strong>Email:</strong> {teacher.email}
+          <br />
+          <strong>Phone:</strong> {teacher.phone || "N/A"}
+        </Card.Text>
+
+        <Card.Title>Booking History</Card.Title>
+        
+          
+        
+      </Card.Body>
+    </Card>
+    {teacher.schedules && teacher.schedules.length > 0 ? (
+    <MaterialReactTable
+        key={teacher.schedules.length} // Force re-render when data changes
+        columns={columns}
+        data={teacher.schedules}
+        initialState={{ pagination }}
+        onPaginationChange={(newPagination) => {
+          console.log('Pagination Changed:', newPagination);
+          setPagination(newPagination);
+        }}
+        state={{ pagination: pagination }} // Ensure controlled pagination state
+        manualPagination={false} // Ensure the table handles pagination internally
+      />
+    ) : (
+        <Alert variant="info">No schedules found for this teacher.</Alert>
+      )}
+=======
 
   return (
     <div>
@@ -474,8 +571,13 @@ const handleUpdateSchedule = async (e) => {
           </form>
         </Modal.Body>
       </Modal>
+>>>>>>> ef74eb1 (Initial commit with Next.js coworking space management app)
     </div>
   );
 };
 
+<<<<<<< HEAD
+export default TeacherProfile;
+=======
 export default ProtectedRoute(TeacherProfile);
+>>>>>>> ef74eb1 (Initial commit with Next.js coworking space management app)

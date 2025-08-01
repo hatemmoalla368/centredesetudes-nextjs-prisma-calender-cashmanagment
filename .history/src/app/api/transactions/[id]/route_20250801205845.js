@@ -1,12 +1,19 @@
 import { NextResponse } from "next/server"; // Import NextResponse
 import { PrismaClient } from "@prisma/client";
+<<<<<<< HEAD
+=======
 import { authMiddleware } from "@/lib/auth";
+>>>>>>> ef74eb1 (Initial commit with Next.js coworking space management app)
 
 const prisma = new PrismaClient();
 // Handler for PUT (Update) and DELETE (Delete) requests for a specific schedule
 
 
+<<<<<<< HEAD
+export async function DELETE(req, { params }) {
+=======
 export const DELETE = authMiddleware (async(request, { params })=> {
+>>>>>>> ef74eb1 (Initial commit with Next.js coworking space management app)
   try {
     const { id } = params; // Extract schedule ID from the URL params
 
@@ -21,6 +28,9 @@ export const DELETE = authMiddleware (async(request, { params })=> {
     console.error("Error deleting transaction:", error);
     return NextResponse.json({ message: "Failed to delete transaction" }, { status: 500 });
   }
+<<<<<<< HEAD
+}
+=======
 })
 export const PUT = authMiddleware (async(request, { params })=> {
   try {
@@ -64,3 +74,4 @@ export const PUT = authMiddleware (async(request, { params })=> {
     })
   }
 })
+>>>>>>> ef74eb1 (Initial commit with Next.js coworking space management app)
