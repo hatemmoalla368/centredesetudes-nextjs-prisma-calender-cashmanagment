@@ -61,12 +61,10 @@ export const DELETE = authMiddleware(async (request, { params }) => {
       return NextResponse.json({ error: 'Receipt not found' }, { status: 404 });
     }
 
-    if (receipt.transactionId) {
-      await prisma.transaction.update({
-        where: { id: receipt.transactionId },
-        data: { hasReceipt: false },
-      });
-    }
+    await prisma.transaction.update({
+      where: { id: receipt.transactionId },
+      data: { hasReceipt: false },
+    });
 
     await prisma.receipt.delete({
       where: { id },
