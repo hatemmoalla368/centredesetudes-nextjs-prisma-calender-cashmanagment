@@ -8,7 +8,7 @@ const prisma = new PrismaClient();
 export const POST = authMiddleware(async (req, { params }) => {
   try {
     const { classroomId, startTime, endTime, excludeScheduleId } = await req.json();
-    const timezone = "Africa/Tunis"; // Replace with your local timezone
+    const timezone = "Asia/Jakarta"; // Replace with your local timezone
 
     console.log("Received request with:", { classroomId, startTime, endTime, excludeScheduleId });
 

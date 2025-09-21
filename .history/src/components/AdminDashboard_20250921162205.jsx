@@ -213,21 +213,20 @@ const [loading, setLoading] = useState(true);
     }
   };
 
-const dateToLocalInput = (dateString) => {
-    // Convert UTC date from the server to local timezone
-    return DateTime.fromISO(dateString, { zone: "utc" })
-      .setZone(timezone)
-      .toFormat("yyyy-MM-dd'T'HH:mm");
+const handleEditClick = (schedule) => {
+  const dateToLocalInput = (dateString) => {
+    const date = new Date(dateString);
+    // Format for datetime-local input (YYYY-MM-DDTHH:MM)
+    return `${date.getFullYear()}-${(date.getMonth()+1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}T${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
   };
 
-  const handleEditClick = (schedule) => {
-    setEditingSchedule({
-      ...schedule,
-      startTime: dateToLocalInput(schedule.startTime),
-      endTime: dateToLocalInput(schedule.endTime),
-    });
-    setShowEditModal(true);
-  };
+  setEditingSchedule({
+    ...schedule,
+    startTime: dateToLocalInput(schedule.startTime),
+    endTime: dateToLocalInput(schedule.endTime)
+  });
+  setShowEditModal(true);
+};
 
 const handleEditChange = (e) => {
   const { name, value, type, checked } = e.target;
@@ -302,21 +301,13 @@ const handleUpdateSchedule = async (e) => {
         accessorKey: "startTime", // Assuming startTime is in ISO format
         header: "Start Time",
         size: 100,
-        Cell: ({ cell }) => {
-          const date = DateTime.fromISO(cell.row.original.startTime, { zone: "utc" })
-            .setZone(timezone);
-          return date.toFormat('dd/MM/yyyy HH:mm');
-        }, // Format the date
+        Cell: ({ cell }) => new Date(cell.row.original.startTime).toLocaleString(), // Format the date
       },
       {
         accessorKey: "endTime", // Assuming endTime is in ISO format
         header: "End Time",
         size: 100,
-        Cell: ({ cell }) => {
-          const date = DateTime.fromISO(cell.row.original.endTime, { zone: "utc" })
-            .setZone(timezone);
-          return date.toFormat('dd/MM/yyyy HH:mm');
-        },
+        Cell: ({ cell }) => new Date(cell.row.original.endTime).toLocaleString(),
       },
  
       {

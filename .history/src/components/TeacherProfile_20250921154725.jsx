@@ -1,5 +1,5 @@
 
-"use client";
+"use client"
 import React, { useEffect, useMemo, useState } from "react";
 import { Card, Alert, Spinner, Modal, Button as BootstrapButton, ListGroup } from "react-bootstrap";
 import { useRouter } from "next/navigation";
@@ -10,103 +10,103 @@ import GroupsIcon from '@mui/icons-material/Groups';
 import CloseIcon from '@mui/icons-material/Close';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import { jsPDF } from "jspdf";
-import autoTable from "jspdf-autotable";
+import autoTable from "jspdf-autotable";  // Note: This is the correct import for v4+
 import EditIcon from "@mui/icons-material/Edit";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useAuth } from "@/contexts/AuthContext";
-import { DateTime } from "luxon";
+
 import ProtectedRoute from "./ProtectedRoute";
 
 const TeacherProfile = ({ teacherId }) => {
-  const timezone = "Africa/Tunis"; // Replace with your local timezone, e.g., "Asia/Jakarta"
   const [pagination, setPagination] = useState({
     pageIndex: 0,
     pageSize: 10,
   });
   const [classrooms, setClassrooms] = useState([]);
-  const [teachers, setTeachers] = useState([]);
+    const [teachers, setTeachers] = useState([]);
   const [teacher, setTeacher] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showGroupsModal, setShowGroupsModal] = useState(false);
   const router = useRouter();
   const [showEditModal, setShowEditModal] = useState(false);
-  const [editingSchedule, setEditingSchedule] = useState({
-    id: "",
-    classroomId: "",
-    startTime: "",
-    endTime: "",
-    description: "",
-    recurringWeekly: false,
-    teacherId: "",
+const [editingSchedule, setEditingSchedule] = useState({
+  id: "",
+  classroomId: "",
+  startTime: "",
+  endTime: "",
+  description: "",
+  recurringWeekly: false,
+  teacherId: "",
+});
+const [selectedGroup, setSelectedGroup] = useState(null);
+
+
+ const exportGroupPDF = (group) => {
+  if (!teacher || !group) return;
+
+  const doc = new jsPDF({
+    orientation: 'landscape'
   });
-  const [selectedGroup, setSelectedGroup] = useState(null);
 
-  const exportGroupPDF = (group) => {
-    if (!teacher || !group) return;
+  // TEACHER INFO HEADER - Properly aligned
+  doc.setFontSize(16);
+  doc.text(`Teacher: ${teacher.name}`, 20, 20);
+  
+  doc.setFontSize(12);
+  // Align all secondary info at same left margin (20)
+  doc.text(`Email: ${teacher.email}`, 20, 30);
+  doc.text(`Phone: ${teacher.phone || 'N/A'}`, 20, 40);
+  doc.text(`Group: ${group.name}`, 20, 50);
+  doc.text(`Date: ${new Date().toLocaleDateString()}`, 20, 60);
 
-    const doc = new jsPDF({
-      orientation: 'landscape'
-    });
-
-    // TEACHER INFO HEADER - Properly aligned
-    doc.setFontSize(16);
-    doc.text(`Teacher: ${teacher.name}`, 20, 20);
-    
-    doc.setFontSize(12);
-    doc.text(`Email: ${teacher.email}`, 20, 30);
-    doc.text(`Phone: ${teacher.phone || 'N/A'}`, 20, 40);
-    doc.text(`Group: ${group.name}`, 20, 50);
-    doc.text(`Date: ${DateTime.now().setZone(timezone).toFormat('MM/dd/yyyy')}`, 20, 60);
-
-    // Rest of your PDF generation code...
-    const startY = 70; // Start table below header info
-    
-    const columnStyles = {
-      0: { cellWidth: 40, halign: 'left' }, // Name
-      1: { cellWidth: 30, halign: 'left' }  // Phone
-    };
-    
-    // Add attendance columns
-    for (let i = 2; i < 18; i++) {
-      columnStyles[i] = { cellWidth: 15 };
-    }
-
-    // Table data with empty header row + students + empty rows
-    const tableData = [
-      ['', '', ...Array(16).fill('')], // Empty header
-      ...(group.students?.map(student => [
-        student.name,
-        student.phone,
-        ...Array(16).fill('')
-      ]) || []),
-      ...Array(15).fill(['', '', ...Array(16).fill('')]) // Empty rows
-    ];
-
-    autoTable(doc, {
-      startY,
-      body: tableData,
-      styles: {
-        fontSize: 10,
-        cellPadding: 4,
-        lineWidth: 0.5,
-        lineColor: [0, 0, 0],
-        fillColor: [255, 255, 255],
-        halign: 'center',
-        valign: 'middle'
-      },
-      columnStyles,
-      margin: { left: 20 },
-      didDrawCell: (data) => {
-        doc.setDrawColor(0, 0, 0);
-        doc.rect(data.cell.x, data.cell.y, data.cell.width, data.cell.height, 'S');
-      }
-    });
-
-    doc.save(`${teacher.name.replace(/\s+/g, '_')}_${group.name.replace(/\s+/g, '_')}_Attendance.pdf`);
+  // Rest of your PDF generation code...
+  const startY = 70; // Start table below header info
+  
+  const columnStyles = {
+    0: { cellWidth: 40, halign: 'left' }, // Name
+    1: { cellWidth: 30, halign: 'left' }  // Phone
   };
+  
+  // Add attendance columns
+  for (let i = 2; i < 18; i++) {
+    columnStyles[i] = { cellWidth: 15 };
+  }
 
+  // Table data with empty header row + students + empty rows
+  const tableData = [
+    ['', '', ...Array(16).fill('')], // Empty header
+    ...(group.students?.map(student => [
+      student.name,
+      student.phone,
+      ...Array(16).fill('')
+    ]) || []),
+    ...Array(15).fill(['', '', ...Array(16).fill('')]) // Empty rows
+  ];
+
+  autoTable(doc, {
+    startY,
+    body: tableData,
+    styles: {
+      fontSize: 10,
+      cellPadding: 4,
+      lineWidth: 0.5,
+      lineColor: [0, 0, 0],
+      fillColor: [255, 255, 255],
+      halign: 'center',
+      valign: 'middle'
+    },
+    columnStyles,
+    margin: { left: 20 },
+    didDrawCell: (data) => {
+      doc.setDrawColor(0, 0, 0);
+      doc.rect(data.cell.x, data.cell.y, data.cell.width, data.cell.height, 'S');
+    }
+  });
+
+  doc.save(`${teacher.name.replace(/\s+/g, '_')}_${group.name.replace(/\s+/g, '_')}_Attendance.pdf`);
+};
   const fetchTeacherProfile = async () => {
     try {
       const response = await fetch(`/api/teachers/${teacherId}?includeGroups=true`);
@@ -129,6 +129,20 @@ const TeacherProfile = ({ teacherId }) => {
     fetchTeachers();
   }, [teacherId]);
 
+  const handleDelete = async (id) => {
+    try {
+      const response = await fetch(`/api/schedules/${id}`, {
+        method: "DELETE",
+      });
+      if (response.ok) {
+        fetchTeacherProfile();
+      } else {
+        console.error("Failed to delete schedule");
+      }
+    } catch (error) {
+      console.error("Error deleting schedule:", error);
+    }
+  };
   const fetchClassrooms = async () => {
     try {
       const response = await fetch("/api/classrooms");
@@ -148,96 +162,77 @@ const TeacherProfile = ({ teacherId }) => {
       console.error("Error fetching teachers:", error);
     }
   };
-
-  const handleDelete = async (id) => {
-    try {
-      const response = await fetch(`/api/schedules/${id}`, {
-        method: "DELETE",
-      });
-      if (response.ok) {
-        fetchTeacherProfile();
-        toast.success("Schedule deleted successfully!");
-      } else {
-        throw new Error("Failed to delete schedule.");
-      }
-    } catch (error) {
-      console.error("Error deleting schedule:", error);
-      toast.error(error.message);
-    }
-  };
-
+const handleEditClick = (schedule) => {
   const dateToLocalInput = (dateString) => {
-    return DateTime.fromISO(dateString, { zone: "utc" })
-      .setZone(timezone)
-      .toFormat("yyyy-MM-dd'T'HH:mm");
+    const date = new Date(dateString);
+    // Format for datetime-local input (YYYY-MM-DDTHH:MM)
+    return `${date.getFullYear()}-${(date.getMonth()+1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}T${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
   };
 
-  const handleEditClick = (schedule) => {
-    setEditingSchedule({
-      ...schedule,
-      startTime: dateToLocalInput(schedule.startTime),
-      endTime: dateToLocalInput(schedule.endTime),
-    });
-    setShowEditModal(true);
-  };
+  setEditingSchedule({
+    ...schedule,
+    startTime: dateToLocalInput(schedule.startTime),
+    endTime: dateToLocalInput(schedule.endTime)
+  });
+  setShowEditModal(true);
+};
 
-  const handleEditChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setEditingSchedule({
-      ...editingSchedule,
-      [name]: type === "checkbox" ? checked : value,
-    });
-  };
+const handleEditChange = (e) => {
+  const { name, value, type, checked } = e.target;
+  setEditingSchedule({
+    ...editingSchedule,
+    [name]: type === "checkbox" ? checked : value,
+  });
+};
 
-  const handleUpdateSchedule = async (e) => {
-    e.preventDefault();
-    try {
-      const { classroomId, startTime, endTime } = editingSchedule;
+const handleUpdateSchedule = async (e) => {
+  e.preventDefault();
+  try {
+    const { classroomId, startTime, endTime } = editingSchedule;
 
-      // Validate that endTime is after startTime
-      if (new Date(endTime) <= new Date(startTime)) {
-        throw new Error("End time must be after start time.");
-      }
-
-      // Check for conflicts (excluding the current schedule)
-      const conflictResponse = await fetch("/api/schedules/check-conflict", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          classroomId,
-          startTime,
-          endTime,
-          excludeScheduleId: editingSchedule.id,
-        }),
-      });
-
-      if (!conflictResponse.ok) {
-        const conflictData = await conflictResponse.json();
-        throw new Error(conflictData.error || "Classroom is already booked at the requested time.");
-      }
-
-      const response = await fetch(`/api/schedules/${editingSchedule.id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(editingSchedule),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to update schedule.");
-      }
-
-      fetchTeacherProfile();
-      setShowEditModal(false);
-      toast.success("Schedule updated successfully!");
-    } catch (error) {
-      toast.error(error.message);
+    // Validate that endTime is after startTime
+    if (new Date(endTime) <= new Date(startTime)) {
+      throw new Error("End time must be after start time.");
     }
-  };
 
+    // Check for conflicts (excluding the current schedule)
+    const conflictResponse = await fetch("/api/schedules/check-conflict", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        classroomId,
+        startTime,
+        endTime,
+        excludeScheduleId: editingSchedule.id,
+      }),
+    });
+
+    if (!conflictResponse.ok) {
+      const conflictData = await conflictResponse.json();
+      throw new Error(conflictData.error || "Classroom is already booked at the requested time.");
+    }
+
+    const response = await fetch(`/api/schedules/${editingSchedule.id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(editingSchedule),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to update schedule.");
+    }
+
+    fetchTeacherProfile()
+    setShowEditModal(false);
+    toast.success("Schedule updated successfully!");
+  } catch (error) {
+    toast.error(error.message);
+  }
+};
   const columns = useMemo(
     () => [
       {
@@ -249,21 +244,13 @@ const TeacherProfile = ({ teacherId }) => {
         accessorKey: "startTime",
         header: "Start Time",
         size: 100,
-        Cell: ({ cell }) => {
-          const date = DateTime.fromISO(cell.row.original.startTime, { zone: "utc" })
-            .setZone(timezone);
-          return date.toFormat('dd/MM/yyyy HH:mm');
-        },
+        Cell: ({ cell }) => new Date(cell.row.original.startTime).toLocaleString(),
       },
       {
         accessorKey: "endTime",
         header: "End Time",
         size: 100,
-        Cell: ({ cell }) => {
-          const date = DateTime.fromISO(cell.row.original.endTime, { zone: "utc" })
-            .setZone(timezone);
-          return date.toFormat('dd/MM/yyyy HH:mm');
-        },
+        Cell: ({ cell }) => new Date(cell.row.original.endTime).toLocaleString(),
       },
       {
         accessorKey: "description",
@@ -277,14 +264,14 @@ const TeacherProfile = ({ teacherId }) => {
         Cell: ({ cell }) => (
           <div className="d-flex gap-2">
             <Button
-              onClick={() => handleEditClick(cell.row.original)}
-              variant="contained"
-              color="primary"
-              size="small"
-              className="text-primary btn-link edit"
-            >
-              <EditIcon />
-            </Button>
+            onClick={() => handleEditClick(cell.row.original)}
+            variant="contained"
+            color="primary"
+            size="small"
+            className="text-primary btn-link edit"
+          >
+            <EditIcon />
+          </Button>
             <Button
               onClick={() => handleDelete(cell.row.original.id)}
               variant="contained"
@@ -330,14 +317,15 @@ const TeacherProfile = ({ teacherId }) => {
             </div>
             {teacher.groups && teacher.groups.length > 0 && (
               <div>
-                <Button
-                  variant="outlined"
-                  startIcon={<GroupsIcon />}
-                  onClick={() => setShowGroupsModal(true)}
-                >
-                  View Groups ({teacher.groups.length})
-                </Button>
-              </div>
+              <Button
+                variant="outlined"
+                startIcon={<GroupsIcon />}
+                onClick={() => setShowGroupsModal(true)}
+              >
+                View Groups ({teacher.groups.length})
+              </Button>
+                 
+                </div>
             )}
           </div>
 
@@ -363,7 +351,7 @@ const TeacherProfile = ({ teacherId }) => {
       )}
 
       {/* Groups Modal */}
-      <Modal show={showGroupsModal} onHide={() => setShowGroupsModal(false)} size="lg">
+        <Modal show={showGroupsModal} onHide={() => setShowGroupsModal(false)} size="lg">
         <Modal.Header closeButton>
           <Modal.Title>{teacher?.name}'s Groups</Modal.Title>
         </Modal.Header>
@@ -374,7 +362,7 @@ const TeacherProfile = ({ teacherId }) => {
                 <strong>{group.name}</strong>
                 <Button 
                   variant="outlined"
-                  size="small"
+                  size="sm"
                   onClick={() => exportGroupPDF(group)}
                   startIcon={<PictureAsPdfIcon fontSize="small" />}
                 >
@@ -394,8 +382,6 @@ const TeacherProfile = ({ teacherId }) => {
           ))}
         </Modal.Body>
       </Modal>
-
-      {/* Edit Schedule Modal */}
       <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
         <Modal.Header closeButton>
           <Modal.Title>Edit Schedule</Modal.Title>
@@ -439,24 +425,26 @@ const TeacherProfile = ({ teacherId }) => {
             <div className="mb-3">
               <label htmlFor="startTime" className="form-label">Start Time</label>
               <input
-                type="datetime-local"
-                name="startTime"
-                value={editingSchedule.startTime}
-                onChange={handleEditChange}
-                required
-                step="900" // 15-minute intervals
-              />
+        type="datetime-local"
+        name="startTime"
+        value={editingSchedule.startTime}
+        onChange={handleEditChange}
+        required
+          step="900" // 15-minute intervals
+      
+      />
             </div>
             <div className="mb-3">
               <label htmlFor="endTime" className="form-label">End Time</label>
               <input
-                type="datetime-local"
-                name="endTime"
-                value={editingSchedule.endTime}
-                onChange={handleEditChange}
-                required
-                step="900" // 15-minute intervals
-              />
+        type="datetime-local"
+        name="endTime"
+        value={editingSchedule.endTime}
+        onChange={handleEditChange}
+        required
+          step="900" // 15-minute intervals
+      
+      />
             </div>
             <div className="mb-3">
               <label htmlFor="description" className="form-label">Description</label>
@@ -486,8 +474,6 @@ const TeacherProfile = ({ teacherId }) => {
           </form>
         </Modal.Body>
       </Modal>
-
-      <ToastContainer />
     </div>
   );
 };

@@ -71,7 +71,7 @@ export const PUT = authMiddleware(async (request, { params }) => {
     const id = request.url.split("/").pop();
     const body = await request.json();
     const { classroomId, teacherId, startTime, endTime, description, recurringWeekly } = body;
-    const timezone = "Africa/Tunis"; // Replace with your local timezone
+    const timezone = "Asia/Jakarta"; // Replace with your local timezone
 
     // Convert to Date objects in local timezone and then to UTC
     const startDate = DateTime.fromISO(startTime, { zone: timezone }).toUTC().toJSDate();

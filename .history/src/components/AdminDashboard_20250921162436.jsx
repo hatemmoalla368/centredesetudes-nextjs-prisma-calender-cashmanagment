@@ -302,21 +302,13 @@ const handleUpdateSchedule = async (e) => {
         accessorKey: "startTime", // Assuming startTime is in ISO format
         header: "Start Time",
         size: 100,
-        Cell: ({ cell }) => {
-          const date = DateTime.fromISO(cell.row.original.startTime, { zone: "utc" })
-            .setZone(timezone);
-          return date.toFormat('dd/MM/yyyy HH:mm');
-        }, // Format the date
+        Cell: ({ cell }) => new Date(cell.row.original.startTime).toLocaleString(), // Format the date
       },
       {
         accessorKey: "endTime", // Assuming endTime is in ISO format
         header: "End Time",
         size: 100,
-        Cell: ({ cell }) => {
-          const date = DateTime.fromISO(cell.row.original.endTime, { zone: "utc" })
-            .setZone(timezone);
-          return date.toFormat('dd/MM/yyyy HH:mm');
-        },
+        Cell: ({ cell }) => new Date(cell.row.original.endTime).toLocaleString(),
       },
  
       {

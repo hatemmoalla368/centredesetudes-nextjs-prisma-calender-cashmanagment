@@ -252,7 +252,7 @@ const TeacherProfile = ({ teacherId }) => {
         Cell: ({ cell }) => {
           const date = DateTime.fromISO(cell.row.original.startTime, { zone: "utc" })
             .setZone(timezone);
-          return date.toFormat('dd/MM/yyyy HH:mm');
+          return date.toFormat('MM/dd/yyyy HH:mm');
         },
       },
       {
@@ -262,7 +262,7 @@ const TeacherProfile = ({ teacherId }) => {
         Cell: ({ cell }) => {
           const date = DateTime.fromISO(cell.row.original.endTime, { zone: "utc" })
             .setZone(timezone);
-          return date.toFormat('dd/MM/yyyy HH:mm');
+          return date.toFormat('dd/dd/yyyy HH:mm');
         },
       },
       {

@@ -299,24 +299,22 @@ const handleUpdateSchedule = async (e) => {
         size: 100,
       },
    {
-        accessorKey: "startTime", // Assuming startTime is in ISO format
+        accessorKey: "startTime",
         header: "Start Time",
         size: 100,
-        Cell: ({ cell }) => {
-          const date = DateTime.fromISO(cell.row.original.startTime, { zone: "utc" })
-            .setZone(timezone);
-          return date.toFormat('dd/MM/yyyy HH:mm');
-        }, // Format the date
+        Cell: ({ cell }) =>
+          DateTime.fromISO(cell.row.original.startTime, { zone: "utc" })
+            .setZone(timezone)
+            .toLocaleString(DateTime.DATETIME_FULL),
       },
       {
-        accessorKey: "endTime", // Assuming endTime is in ISO format
+        accessorKey: "endTime",
         header: "End Time",
         size: 100,
-        Cell: ({ cell }) => {
-          const date = DateTime.fromISO(cell.row.original.endTime, { zone: "utc" })
-            .setZone(timezone);
-          return date.toFormat('dd/MM/yyyy HH:mm');
-        },
+        Cell: ({ cell }) =>
+          DateTime.fromISO(cell.row.original.endTime, { zone: "utc" })
+            .setZone(timezone)
+            .toLocaleString(DateTime.DATETIME_FULL),
       },
  
       {

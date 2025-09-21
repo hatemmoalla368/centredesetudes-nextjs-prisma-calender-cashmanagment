@@ -1,4 +1,4 @@
-
+```javascriptreact
 "use client";
 import React, { useEffect, useMemo, useState } from "react";
 import { Card, Alert, Spinner, Modal, Button as BootstrapButton, ListGroup } from "react-bootstrap";
@@ -19,7 +19,7 @@ import { DateTime } from "luxon";
 import ProtectedRoute from "./ProtectedRoute";
 
 const TeacherProfile = ({ teacherId }) => {
-  const timezone = "Africa/Tunis"; // Replace with your local timezone, e.g., "Asia/Jakarta"
+  const timezone = "Europe/Paris"; // Replace with your local timezone, e.g., "Asia/Jakarta"
   const [pagination, setPagination] = useState({
     pageIndex: 0,
     pageSize: 10,
@@ -252,7 +252,7 @@ const TeacherProfile = ({ teacherId }) => {
         Cell: ({ cell }) => {
           const date = DateTime.fromISO(cell.row.original.startTime, { zone: "utc" })
             .setZone(timezone);
-          return date.toFormat('dd/MM/yyyy HH:mm');
+          return date.toFormat('MM/dd/yyyy HH:mm');
         },
       },
       {
@@ -262,7 +262,7 @@ const TeacherProfile = ({ teacherId }) => {
         Cell: ({ cell }) => {
           const date = DateTime.fromISO(cell.row.original.endTime, { zone: "utc" })
             .setZone(timezone);
-          return date.toFormat('dd/MM/yyyy HH:mm');
+          return date.toFormat('MM/dd/yyyy HH:mm');
         },
       },
       {

@@ -37,7 +37,7 @@ export const GET = authMiddleware(async (request, { params }) => {
 export const POST = authMiddleware(async (req, { params }) => {
   try {
     const { schedules } = await req.json();
-    const timezone = "Africa/Tunis"; // Replace with your local timezone
+    const timezone = "Asia/Jakarta"; // Replace with your local timezone
 
     // Validate input
     if (!schedules || !Array.isArray(schedules)) {
