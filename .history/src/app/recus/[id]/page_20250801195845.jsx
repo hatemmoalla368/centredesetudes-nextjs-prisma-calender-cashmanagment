@@ -9,11 +9,12 @@ import { notFound } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import ProtectedRoute from '@/components/ProtectedRoute';
 const COMPANY_INFO = {
-  name: 'Espace Horizons du progrès',
+  name: 'EduSpace Coworking',
   logo: '/logo.png',
-  address: 'Route Manzel Chaker klm 5.5, Markez moalla, Sfax',
-  phone: '+216 24 021 594',
-  email: 'afaktakadom@gmail.com',
+  address: '24 Rue de l\'Éducation, Tunis 1002',
+  phone: '+216 70 123 456',
+  email: 'contact@eduspace.tn',
+  matricule: 'MF12345678',
 };
 
 const ReceiptView = ({ params })=> {
@@ -97,7 +98,7 @@ const ReceiptView = ({ params })=> {
               <p className="mb-0 mt-2">{receipt.companyAddress}</p>
               <p className="mb-0">Tél: {receipt.companyPhone}</p>
               <p className="mb-0">Email: {receipt.companyEmail}</p>
-              
+              <p>Matricule Fiscale: {receipt.matriculeFiscale}</p>
             </div>
             <div className="text-end">
               <h2 className="mb-1">REÇU DE PAIEMENT</h2>
@@ -113,7 +114,7 @@ const ReceiptView = ({ params })=> {
                 <p className="mb-1"><strong>{receipt.companyName}</strong></p>
                 <p className="mb-0 text-muted">{receipt.companyAddress}</p>
                 <p className="mb-0">Tél: {receipt.companyPhone}</p>
-                
+                <p className="mb-0">Matricule Fiscale: {receipt.matriculeFiscale}</p>
               </div>
             </Col>
             <Col md={6}>

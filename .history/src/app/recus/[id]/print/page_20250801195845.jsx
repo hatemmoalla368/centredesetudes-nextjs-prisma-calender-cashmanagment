@@ -164,7 +164,7 @@ const ReceiptPrint = ({ params }) => {
             <p className="mb-0 mt-2">{receipt.companyAddress}</p>
             <p className="mb-0">Tél: {receipt.companyPhone}</p>
             <p className="mb-0">Email: {receipt.companyEmail}</p>
-            
+            <p>Matricule Fiscale: {receipt.matriculeFiscale}</p>
           </div>
           <div className="text-end">
             <h2 className="mb-1">REÇU DE PAIEMENT</h2>
@@ -180,7 +180,7 @@ const ReceiptPrint = ({ params }) => {
               <p className="mb-1"><strong>{receipt.companyName}</strong></p>
               <p className="mb-0 text-muted">{receipt.companyAddress}</p>
               <p className="mb-0">Tél: {receipt.companyPhone}</p>
-              
+              <p className="mb-5">Matricule Fiscale: {receipt.matriculeFiscale}</p>
             </div>
           </div>
           <div className="col-md-6">

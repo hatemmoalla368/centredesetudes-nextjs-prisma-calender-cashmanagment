@@ -134,8 +134,8 @@ model Receipt {
   companyName       String   @default("Espace Horizons du progrès")
   companyLogo       String   @default("/logo.png")
   companyAddress    String   @default("Route Manzel Chaker klm 5.5, Markez moalla, Sfax")
-  companyPhone      String   @default("+216 24 021 594")
-  companyEmail      String   @default("afaktakadom@gmail.com")
+  companyPhone      String   @default("+216 70 123 456")
+  companyEmail      String   @default("contact@eduspace.tn")
   matriculeFiscale  String   @default("MF12345678")
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt

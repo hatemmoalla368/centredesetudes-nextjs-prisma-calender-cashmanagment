@@ -113,7 +113,7 @@ const ReceiptView = ({ params })=> {
                 <p className="mb-1"><strong>{receipt.companyName}</strong></p>
                 <p className="mb-0 text-muted">{receipt.companyAddress}</p>
                 <p className="mb-0">Tél: {receipt.companyPhone}</p>
-                
+                <p className="mb-0">Matricule Fiscale: {receipt.matriculeFiscale}</p>
               </div>
             </Col>
             <Col md={6}>

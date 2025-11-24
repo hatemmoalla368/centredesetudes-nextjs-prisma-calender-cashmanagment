@@ -135,7 +135,7 @@ model Receipt {
   companyLogo       String   @default("/logo.png")
   companyAddress    String   @default("Route Manzel Chaker klm 5.5, Markez moalla, Sfax")
   companyPhone      String   @default("+216 24 021 594")
-  companyEmail      String   @default("afaktakadom@gmail.com")
+  companyEmail      String   @default("contact@eduspace.tn")
   matriculeFiscale  String   @default("MF12345678")
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt

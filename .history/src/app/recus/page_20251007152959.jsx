@@ -257,7 +257,7 @@ const ReceiptsList = () => {
           companyAddress: COMPANY_INFO.address,
           companyPhone: COMPANY_INFO.phone,
           companyEmail: COMPANY_INFO.email,
-          
+          matriculeFiscale: COMPANY_INFO.matricule,
         }),
       });
 

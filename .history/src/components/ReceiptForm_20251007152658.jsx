@@ -14,8 +14,8 @@ const COMPANY_INFO = {
   logo: '/logo.png',
   address: 'Route Manzel Chaker klm 5.5, Markez moalla, Sfax',
   phone: '+216 24 021 594',
-  email: 'afaktakadom@gmail.com',
-  
+  email: 'contact@eduspace.tn',
+  matricule: 'MF12345678',
 };
 
 const ReceiptForm =({ initialReceipt = null })=> {
@@ -83,7 +83,7 @@ const [loading, setLoading] = useState(true);
         address: initialReceipt.companyAddress || COMPANY_INFO.address,
         phone: initialReceipt.companyPhone || COMPANY_INFO.phone,
         email: initialReceipt.companyEmail || COMPANY_INFO.email,
-        
+        matricule: initialReceipt.matriculeFiscale || COMPANY_INFO.matricule,
         place: initialReceipt.place || 'Tunis',
       });
     }
@@ -235,7 +235,7 @@ const [loading, setLoading] = useState(true);
           companyAddress: receipt.address,
           companyPhone: receipt.phone,
           companyEmail: receipt.email,
-          
+          matriculeFiscale: receipt.matricule,
         }),
       });
 
@@ -491,7 +491,7 @@ const [loading, setLoading] = useState(true);
             <p className="mb-0 mt-2">{receipt.address}</p>
             <p className="mb-0">Tél: {receipt.phone}</p>
             <p className="mb-0">Email: {receipt.email}</p>
-            
+            <p>Matricule Fiscale: {receipt.matricule}</p>
           </div>
           <div className="text-end">
             <h2 className="mb-1">REÇU DE PAIEMENT</h2>
@@ -507,7 +507,7 @@ const [loading, setLoading] = useState(true);
               <p className="mb-1"><strong>{receipt.name}</strong></p>
               <p className="mb-0 text-muted">{receipt.address}</p>
               <p className="mb-0">Tél: {receipt.phone}</p>
-              
+              <p className="mb-5">Matricule Fiscale: {receipt.matricule}</p>
             </div>
           </div>
           <div className="col-md-6">

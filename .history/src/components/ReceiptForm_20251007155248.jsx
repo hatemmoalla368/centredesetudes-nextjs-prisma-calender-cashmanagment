@@ -550,7 +550,7 @@ const [loading, setLoading] = useState(true);
         <div className="mt-5 pt-4 border-top">
           <div className="d-flex justify-content-between">
             <div>
-              <p className="mb-0">Signature de l'Émetteur</p>
+              
               <p className="border-top pt-4" style={{ width: '200px' }}></p>
             </div>
             <div className="text-end">

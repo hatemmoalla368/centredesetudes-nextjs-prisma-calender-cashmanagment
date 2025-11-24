@@ -110,11 +110,11 @@ model Invoice {
   updatedAt   DateTime @updatedAt
 schedules Schedule[]
   // Company info (redundant storage for archival)
-  companyName String   @default("Espace Horizons du progrès")
+  companyName String   @default("فضاء")
   companyLogo String   @default("/logo.png")
-  companyAddress String @default("Route Manzel Chaker klm 5.5, Markez moalla, Sfax")
-  companyPhone String  @default("+216 24 021 594")
-  companyEmail String  @default("afaktakadom@gmail.com")
+  companyAddress String @default("24 Rue de l'Éducation, Tunis 1002")
+  companyPhone String  @default("+216 70 123 456")
+  companyEmail String  @default("contact@eduspace.tn")
   matriculeFiscale String @default("MF12345678")
 }
 model Receipt {
@@ -131,11 +131,11 @@ model Receipt {
   transactionId     Int?       @unique
   transaction       Transaction? @relation("TransactionReceipt", fields: [transactionId], references: [id])
 
-  companyName       String   @default("Espace Horizons du progrès")
+  companyName       String   @default("EduSpace Coworking")
   companyLogo       String   @default("/logo.png")
-  companyAddress    String   @default("Route Manzel Chaker klm 5.5, Markez moalla, Sfax")
-  companyPhone      String   @default("+216 24 021 594")
-  companyEmail      String   @default("afaktakadom@gmail.com")
+  companyAddress    String   @default("24 Rue de l'Éducation, Tunis 1002")
+  companyPhone      String   @default("+216 70 123 456")
+  companyEmail      String   @default("contact@eduspace.tn")
   matriculeFiscale  String   @default("MF12345678")
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
