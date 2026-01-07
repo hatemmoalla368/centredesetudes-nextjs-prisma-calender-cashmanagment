@@ -1,23 +1,23 @@
 "use client"
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { 
   Button, Card, Col, Form, Row, Tab, Tabs, 
-  Table, Modal, Spinner, Alert, 
-  Container
+  Modal, Spinner, Alert, Container, InputGroup, FormControl
 } from "react-bootstrap";
 import { 
   IconButton, Typography 
 } from "@mui/material";
-import { MaterialReactTable } from 'material-react-table';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import EditIcon from '@mui/icons-material/Edit';
+import SearchIcon from '@mui/icons-material/Search';
 import { toast } from "react-toastify";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from 'next/navigation';
 import ProtectedRoute from "./ProtectedRoute";
+
 const GestionDeCaisse = () => {
- const router = useRouter();
- // State management
+  const router = useRouter();
+  // State management
   const [teachers, setTeachers] = useState([]);
   const [groups, setGroups] = useState([]);
   const [students, setStudents] = useState([]);
@@ -26,21 +26,19 @@ const GestionDeCaisse = () => {
   const [filterStartDate, setFilterStartDate] = useState('');
   const [filterEndDate, setFilterEndDate] = useState('');
   const [filterType, setFilterType] = useState('all');
-  const [pagination, setPagination] = useState({
-    pageIndex: 0,
-    pageSize: 10,
-  });
+  const [filterCategory, setFilterCategory] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [currentTransaction, setCurrentTransaction] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const { isAuthenticated, isAuthLoading } = useAuth();
- useEffect(() => {
+
+  useEffect(() => {
     if (!isAuthenticated) {
       router.push('/login');
       return;
     }
-   
   }, [isAuthenticated, router]);
 
   // Form states
@@ -50,8 +48,7 @@ const GestionDeCaisse = () => {
     description: "",
     category: "salary",
     status: "completed",
-      date: new Date().toISOString().split('T')[0] // Default to today
-
+    date: new Date().toISOString().split('T')[0]
   });
 
   const [classroomTransaction, setClassroomTransaction] = useState({
@@ -60,35 +57,31 @@ const GestionDeCaisse = () => {
     description: "",
     teacherId: "",
     status: "completed",
-      category: "classroom_rent" ,
-        date: new Date().toISOString().split('T')[0] // Default to today
-
-
+    category: "classroom_rent",
+    date: new Date().toISOString().split('T')[0]
   });
 
- const [studentTransaction, setStudentTransaction] = useState({
-  type: "income", // Reçu by default
-  amount: "",
-  description: "",
-  teacherId: "",
-  groupId: "",
-  studentId: "",
-  status: "completed",
-  category: "student_payment",
-    date: new Date().toISOString().split('T')[0] // Default to today
+  const [studentTransaction, setStudentTransaction] = useState({
+    type: "income",
+    amount: "",
+    description: "",
+    teacherId: "",
+    groupId: "",
+    studentId: "",
+    status: "completed",
+    category: "student_payment",
+    date: new Date().toISOString().split('T')[0]
+  });
 
-});
-
-const [teacherPayment, setTeacherPayment] = useState({
-  type: "expense", // Payé by default
-  amount: "",
-  description: "",
-  teacherId: "",
-  status: "completed",
-  category: "teacher_share",
-    date: new Date().toISOString().split('T')[0] // Default to today
-
-});
+  const [teacherPayment, setTeacherPayment] = useState({
+    type: "expense",
+    amount: "",
+    description: "",
+    teacherId: "",
+    status: "completed",
+    category: "teacher_share",
+    date: new Date().toISOString().split('T')[0]
+  });
 
   // Fetch initial data
   useEffect(() => {
@@ -107,47 +100,50 @@ const [teacherPayment, setTeacherPayment] = useState({
     };
     fetchInitialData();
   }, []);
-// Date formatting helper
-const formatDateForInput = (dateString) => {
-  if (!dateString) return new Date().toISOString().split('T')[0];
-  
-  try {
-    // Handle both Date objects and ISO strings
-    const date = new Date(dateString);
-    if (isNaN(date.getTime())) {
+
+  // Date formatting helper
+  const formatDateForInput = (dateString) => {
+    if (!dateString) return new Date().toISOString().split('T')[0];
+    
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) {
+        return new Date().toISOString().split('T')[0];
+      }
+      return date.toISOString().split('T')[0];
+    } catch (e) {
+      console.error("Error formatting date:", e);
       return new Date().toISOString().split('T')[0];
     }
-    return date.toISOString().split('T')[0];
-  } catch (e) {
-    console.error("Error formatting date:", e);
-    return new Date().toISOString().split('T')[0];
-  }
-};
+  };
+
   // Fetch transactions with error handling
   const fetchTransactions = async () => {
-  setLoading(true);
-  setError(null);
-  try {
-    const params = new URLSearchParams();
-    if (filterStartDate) params.append('startDate', filterStartDate);
-    if (filterEndDate) params.append('endDate', filterEndDate);
-    if (filterType !== 'all') params.append('type', filterType);
+    setLoading(true);
+    setError(null);
+    try {
+      const params = new URLSearchParams();
+      if (filterStartDate) params.append('startDate', filterStartDate);
+      if (filterEndDate) params.append('endDate', filterEndDate);
+      if (filterType !== 'all') params.append('type', filterType);
+      if (filterCategory !== 'all') params.append('category', filterCategory);
+      if (searchQuery) params.append('search', searchQuery);
 
-    const url = `/api/transactions?${params.toString()}`;
-    const response = await fetch(url);
-    
-    if (!response.ok) throw new Error("Network response was not ok");
-    
-    const data = await response.json();
-    setTransactions(Array.isArray(data) ? data : []);
-  } catch (err) {
-    setError("Failed to load transactions");
-    setTransactions([]);
-    toast.error("Failed to load transactions");
-  } finally {
-    setLoading(false);
-  }
-};
+      const url = `/api/transactions?${params.toString()}`;
+      const response = await fetch(url);
+      
+      if (!response.ok) throw new Error("Network response was not ok");
+      
+      const data = await response.json();
+      setTransactions(Array.isArray(data) ? data : []);
+    } catch (err) {
+      setError("Failed to load transactions");
+      setTransactions([]);
+      toast.error("Failed to load transactions");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Fetch groups for selected teacher
   const fetchGroups = async (teacherId) => {
@@ -182,75 +178,49 @@ const formatDateForInput = (dateString) => {
 
   // Handle form submissions
   const handleSubmit = async (e, formData, isEdit = false) => {
-  e.preventDefault();
-  try {
-    const url = isEdit 
-      ? `/api/transactions/${formData.id}` 
-      : '/api/transactions';
-    const method = isEdit ? 'PUT' : 'POST';
+    e.preventDefault();
+    try {
+      const url = isEdit 
+        ? `/api/transactions/${formData.id}` 
+        : '/api/transactions';
+      const method = isEdit ? 'PUT' : 'POST';
 
-    const submissionData = {
-      ...formData,
-      amount: parseFloat(formData.amount),
-      date: formData.date || new Date().toISOString(),
-      teacherId: formData.teacherId ? parseInt(formData.teacherId) : null,
-      studentId: formData.studentId ? parseInt(formData.studentId) : null,
-      groupId: formData.groupId ? parseInt(formData.groupId) : null
-    };
+      const submissionData = {
+        ...formData,
+        amount: parseFloat(formData.amount),
+        date: formData.date || new Date().toISOString(),
+        teacherId: formData.teacherId ? parseInt(formData.teacherId) : null,
+        studentId: formData.studentId ? parseInt(formData.studentId) : null,
+        groupId: formData.groupId ? parseInt(formData.groupId) : null
+      };
 
-    // Remove ID for POST requests
-    if (!isEdit) {
-      delete submissionData.id;
+      if (!isEdit) {
+        delete submissionData.id;
+      }
+
+      const response = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(submissionData)
+      });
+
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+      toast.success(`Transaction ${isEdit ? 'updated' : 'added'} successfully!`);
+      fetchTransactions();
+      if (isEdit) setEditModalOpen(false);
+    } catch (err) {
+      console.error("Error:", err);
+      toast.error(`Failed to ${isEdit ? 'update' : 'add'} transaction`);
     }
+  };
 
-    const response = await fetch(url, {
-      method,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(submissionData)
-    });
-
-    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-
-    toast.success(`Transaction ${isEdit ? 'updated' : 'added'} successfully!`);
-    fetchTransactions();
-    if (isEdit) setEditModalOpen(false);
-  } catch (err) {
-    console.error("Error:", err);
-    toast.error(`Failed to ${isEdit ? 'update' : 'add'} transaction`);
-  }
-};
-const handleEditSubmit = async (e, formData) => {
-  e.preventDefault()
-  try {
-    const response = await fetch(`/api/transactions/${formData.id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        // Don't include the ID in the body - it's in the URL
-        type: formData.type,
-        amount: formData.amount,
-        description: formData.description,
-        status: formData.status,
-        category: formData.category,
-        date: formData.date,
-        teacherId: formData.teacherId,
-        studentId: formData.studentId,
-        groupId: formData.groupId
-      })
-    })
-
-    if (!response.ok) throw new Error('Update failed')
-    
-    toast.success('Transaction updated!')
-    fetchTransactions()
-    setEditModalOpen(false)
-  } catch (err) {
-    toast.error('Failed to update transaction')
-    console.error('Update error:', err)
-  }
-}
   // Handle delete
   const handleDelete = async (id) => {
+    if (!confirm("Êtes-vous sûr de vouloir supprimer cette transaction?")) {
+      return;
+    }
+    
     try {
       const response = await fetch(`/api/transactions/${id}`, {
         method: 'DELETE',
@@ -265,157 +235,64 @@ const handleEditSubmit = async (e, formData) => {
   };
 
   // Handle edit click
- const handleEdit = (transaction) => {
-  setCurrentTransaction({
-    ...transaction,
-    amount: transaction.amount.toString(),
-    date: formatDateForInput(transaction.date) // Use the helper here
-  });
-  setEditModalOpen(true);
-};
-
-  // Calculate totals safely
-  const totals = useMemo(() => {
-    const safeTransactions = Array.isArray(transactions) ? transactions : [];
-    
-    const filtered = safeTransactions.filter(t => {
-      try {
-        const transactionDate = new Date(t.date);
-        const startDate = filterStartDate ? new Date(filterStartDate) : null;
-        const endDate = filterEndDate ? new Date(filterEndDate) : null;
-        
-        return (
-          (!startDate || transactionDate >= startDate) && 
-          (!endDate || transactionDate <= endDate) &&
-          (filterType === 'all' || t.type === filterType)
-        );
-      } catch {
-        return false;
-      }
+  const handleEdit = (transaction) => {
+    setCurrentTransaction({
+      ...transaction,
+      amount: transaction.amount.toString(),
+      date: formatDateForInput(transaction.date)
     });
+    setEditModalOpen(true);
+  };
 
-    const income = filtered
+  // Filtered transactions
+  const filteredTransactions = transactions.filter(transaction => {
+    const matchesSearch = searchQuery === '' || 
+      transaction.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (transaction.teacher?.name && transaction.teacher.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (transaction.student?.name && transaction.student.name.toLowerCase().includes(searchQuery.toLowerCase()));
+    
+    const matchesType = filterType === 'all' || transaction.type === filterType;
+    const matchesCategory = filterCategory === 'all' || transaction.category === filterCategory;
+    
+    return matchesSearch && matchesType && matchesCategory;
+  });
+
+  // Calculate totals
+  const totals = {
+    income: filteredTransactions
       .filter(t => t.type === "income")
-      .reduce((sum, t) => sum + (parseFloat(t.amount) || 0), 0);
-      
-    const expenses = filtered
+      .reduce((sum, t) => sum + (parseFloat(t.amount) || 0), 0),
+    expenses: filteredTransactions
       .filter(t => t.type === "expense")
-      .reduce((sum, t) => sum + (parseFloat(t.amount) || 0), 0);
-      
-    return {
-      income,
-      expenses,
-      balance: income - expenses
-    };
-  }, [transactions, filterStartDate, filterEndDate, filterType]);
+      .reduce((sum, t) => sum + (parseFloat(t.amount) || 0), 0),
+    balance: 0
+  };
+  totals.balance = totals.income - totals.expenses;
 
-  // Table columns
-  const columns = useMemo(
-    () => [
-      {
-        accessorKey: "date",
-        header: "Date",
-        Cell: ({ cell }) => {
-          try {
-            return new Date(cell.getValue()).toLocaleDateString();
-          } catch {
-            return "Invalid date";
-          }
-        },
-      },
-      {
-  accessorKey: "type",
-  header: "Type",
-  Cell: ({ cell }) => {
-    const type = cell.getValue();
-    let color = "";
-    let text = "";
-    
-    if (type === "income") {
-      color = "success.main";
-      text = "Reçu";
-    } else if (type === "expense") {
-      color = "error.main";
-      text = "Payé";
-    } else if (type === "receivable") {
-      color = "info.main";
-      text = "Non encore reçu";
-    } else if (type === "payable") {
-      color = "warning.main";
-      text = "Non encore payé";
-    }
-    
-    return <Typography color={color}>{text}</Typography>;
-  },
-},
-      {
-        accessorKey: "amount",
-        header: "Montant",
-        Cell: ({ cell }) => {
-          const amount = parseFloat(cell.getValue());
-          return isNaN(amount) ? "Invalid" : `${amount.toFixed(2)} DT`;
-        },
-      },
-      {
-        accessorKey: "description",
-        header: "Description",
-      },
-      {
-  accessorKey: "category",
-  header: "Catégorie",
-  Cell: ({ cell }) => {
-    const category = cell.getValue();
+  // Helper function to get category display name
+  const getCategoryDisplayName = (category) => {
     switch(category) {
       case "salary": return "Salaire";
       case "taxes": return "Taxes";
-      case "classroom_rent": return "Location salle"; // Updated display name
+      case "classroom_rent": return "Location salle";
       case "student_payment": return "Paiement étudiant";
       case "teacher_share": return "Part enseignant";
       default: return category;
     }
-  }
-},
-      {
-        accessorKey: "teacher.name",
-        header: "Enseignant",
-        Cell: ({ cell }) => cell.getValue() || "-",
-      },
-      {
-        accessorKey: "group.name",
-        header: "Groupe",
-        Cell: ({ cell }) => cell.getValue() || "-",
-      },
-      {
-        accessorKey: "student.name",
-        header: "Étudiant",
-        Cell: ({ cell }) => cell.getValue() || "-",
-      },
-      {
-        accessorKey: "id",
-        header: "Actions",
-        Cell: ({ cell, row }) => (
-          <div>
-            <IconButton 
-              onClick={() => handleEdit(row.original)}
-              color="primary"
-              size="small"
-            >
-              <EditIcon />
-            </IconButton>
-            <IconButton 
-              onClick={() => handleDelete(cell.getValue())}
-              color="error"
-              size="small"
-            >
-              <DeleteForeverIcon />
-            </IconButton>
-          </div>
-        ),
-      },
-    ],
-    []
-  );
-   if (isAuthLoading) {
+  };
+
+  // Helper function to get type display name and color
+  const getTypeDisplay = (type) => {
+    switch(type) {
+      case "income": return { text: "Reçu", color: "success.main" };
+      case "expense": return { text: "Payé", color: "error.main" };
+      case "receivable": return { text: "Non encore reçu", color: "info.main" };
+      case "payable": return { text: "Non encore payé", color: "warning.main" };
+      default: return { text: type, color: "text.primary" };
+    }
+  };
+
+  if (isAuthLoading) {
     return (
       <Container className="my-4 text-center">
         <Spinner animation="border" />
@@ -423,14 +300,11 @@ const handleEditSubmit = async (e, formData) => {
     );
   }
 
-
   return (
     <div className="container my-4">
       <h1 className="text-center mb-4">Gestion de Caisse</h1>
       
       {error && <Alert variant="danger">{error}</Alert>}
-
-     
 
       {/* Transaction tabs */}
       <Tabs activeKey={activeTab} onSelect={(k) => setActiveTab(k)} className="mb-3">
@@ -440,20 +314,20 @@ const handleEditSubmit = async (e, formData) => {
               <Card.Title>Ajouter une Transaction Générale</Card.Title>
               <Form onSubmit={(e) => handleSubmit(e, generalTransaction)}>
                 <Row>
-                   <Col md={3}>
-    <Form.Group className="mb-3">
-      <Form.Label>Date</Form.Label>
-      <Form.Control
-        type="date"
-        value={generalTransaction.date}
-        onChange={(e) => setGeneralTransaction({
-          ...generalTransaction,
-          date: e.target.value
-        })}
-        required
-      />
-    </Form.Group>
-  </Col>
+                  <Col md={3}>
+                    <Form.Group className="mb-3">
+                      <Form.Label>Date</Form.Label>
+                      <Form.Control
+                        type="date"
+                        value={generalTransaction.date}
+                        onChange={(e) => setGeneralTransaction({
+                          ...generalTransaction,
+                          date: e.target.value
+                        })}
+                        required
+                      />
+                    </Form.Group>
+                  </Col>
                   <Col md={4}>
                     <Form.Group className="mb-3">
                       <Form.Label>Type</Form.Label>
@@ -548,19 +422,19 @@ const handleEditSubmit = async (e, formData) => {
               <Form onSubmit={(e) => handleSubmit(e, classroomTransaction)}>
                 <Row>
                   <Col md={3}>
-    <Form.Group className="mb-3">
-      <Form.Label>Date</Form.Label>
-      <Form.Control
-        type="date"
-        value={classroomTransaction.date}
-        onChange={(e) => setClassroomTransaction({
-          ...classroomTransaction,
-          date: e.target.value
-        })}
-        required
-      />
-    </Form.Group>
-  </Col>
+                    <Form.Group className="mb-3">
+                      <Form.Label>Date</Form.Label>
+                      <Form.Control
+                        type="date"
+                        value={classroomTransaction.date}
+                        onChange={(e) => setClassroomTransaction({
+                          ...classroomTransaction,
+                          date: e.target.value
+                        })}
+                        required
+                      />
+                    </Form.Group>
+                  </Col>
                   <Col md={4}>
                     <Form.Group className="mb-3">
                       <Form.Label>Type</Form.Label>
@@ -611,7 +485,6 @@ const handleEditSubmit = async (e, formData) => {
                       </Form.Select>
                     </Form.Group>
                   </Col>
-                  
                 </Row>
                 <Row>
                   <Col md={6}>
@@ -658,50 +531,49 @@ const handleEditSubmit = async (e, formData) => {
               <Form onSubmit={(e) => handleSubmit(e, studentTransaction)}>
                 <Row>
                   <Col md={3}>
-    <Form.Group className="mb-3">
-      <Form.Label>Date</Form.Label>
-      <Form.Control
-        type="date"
-        value={studentTransaction.date}
-        onChange={(e) => setStudentTransaction({
-          ...studentTransaction,
-          date: e.target.value
-        })}
-        required
-      />
-    </Form.Group>
-  </Col>
-                     <Col md={3}>
-            <Form.Group className="mb-3">
-              <Form.Label>Type</Form.Label>
-              <Form.Select 
-                value={studentTransaction.type}
-                onChange={(e) => setStudentTransaction({
-                  ...studentTransaction,
-                  type: e.target.value
-                })}
-              >
-                <option value="income">Reçu</option>
-                <option value="receivable">Non encore reçu</option>
-              </Form.Select>
-            </Form.Group>
-          </Col>
-          
-          <Col md={3}>
-            <Form.Group className="mb-3">
-              <Form.Label>Statut</Form.Label>
-              <Form.Select
-                value={studentTransaction.status}
-                onChange={(e) => setStudentTransaction({
-                  ...studentTransaction,
-                  status: e.target.value
-                })}
-              >
-                <option value="completed">Complété</option>
-                <option value="pending">En attente</option>
-              </Form.Select>
-            </Form.Group>
-          </Col>
+                    <Form.Group className="mb-3">
+                      <Form.Label>Date</Form.Label>
+                      <Form.Control
+                        type="date"
+                        value={studentTransaction.date}
+                        onChange={(e) => setStudentTransaction({
+                          ...studentTransaction,
+                          date: e.target.value
+                        })}
+                        required
+                      />
+                    </Form.Group>
+                  </Col>
+                  <Col md={3}>
+                    <Form.Group className="mb-3">
+                      <Form.Label>Type</Form.Label>
+                      <Form.Select 
+                        value={studentTransaction.type}
+                        onChange={(e) => setStudentTransaction({
+                          ...studentTransaction,
+                          type: e.target.value
+                        })}
+                      >
+                        <option value="income">Reçu</option>
+                        <option value="receivable">Non encore reçu</option>
+                      </Form.Select>
+                    </Form.Group>
+                  </Col>
+                  <Col md={3}>
+                    <Form.Group className="mb-3">
+                      <Form.Label>Statut</Form.Label>
+                      <Form.Select
+                        value={studentTransaction.status}
+                        onChange={(e) => setStudentTransaction({
+                          ...studentTransaction,
+                          status: e.target.value
+                        })}
+                      >
+                        <option value="completed">Complété</option>
+                        <option value="pending">En attente</option>
+                      </Form.Select>
+                    </Form.Group>
+                  </Col>
                   <Col md={3}>
                     <Form.Group className="mb-3">
                       <Form.Label>Enseignant</Form.Label>
@@ -783,20 +655,20 @@ const handleEditSubmit = async (e, formData) => {
                     </Form.Group>
                   </Col>
                   <Col md={3}>
-  <Form.Group className="mb-3">
-    <Form.Label>Catégorie</Form.Label>
-    <Form.Select
-      value={studentTransaction.category}
-      onChange={(e) => setStudentTransaction({
-        ...studentTransaction,
-        category: e.target.value
-      })}
-    >
-      <option value="student_payment">Paiement étudiant</option>
-      <option value="other">Autre</option>
-    </Form.Select>
-  </Form.Group>
-</Col>
+                    <Form.Group className="mb-3">
+                      <Form.Label>Catégorie</Form.Label>
+                      <Form.Select
+                        value={studentTransaction.category}
+                        onChange={(e) => setStudentTransaction({
+                          ...studentTransaction,
+                          category: e.target.value
+                        })}
+                      >
+                        <option value="student_payment">Paiement étudiant</option>
+                        <option value="other">Autre</option>
+                      </Form.Select>
+                    </Form.Group>
+                  </Col>
                 </Row>
                 <Row>
                   <Col md={12}>
@@ -829,51 +701,50 @@ const handleEditSubmit = async (e, formData) => {
               <Card.Title>Paiement de l'Enseignant</Card.Title>
               <Form onSubmit={(e) => handleSubmit(e, teacherPayment)}>
                 <Row>
-                   <Col md={3}>
-    <Form.Group className="mb-3">
-      <Form.Label>Date</Form.Label>
-      <Form.Control
-        type="date"
-        value={teacherPayment.date}
-        onChange={(e) => setTeacherPayment({
-          ...teacherPayment,
-          date: e.target.value
-        })}
-        required
-      />
-    </Form.Group>
-  </Col>
-                     <Col md={3}>
-            <Form.Group className="mb-3">
-              <Form.Label>Type</Form.Label>
-              <Form.Select 
-                value={teacherPayment.type}
-                onChange={(e) => setTeacherPayment({
-                  ...teacherPayment,
-                  type: e.target.value
-                })}
-              >
-                <option value="expense">Payé</option>
-                <option value="payable">Non encore payé</option>
-              </Form.Select>
-            </Form.Group>
-          </Col>
-          
-          <Col md={3}>
-            <Form.Group className="mb-3">
-              <Form.Label>Statut</Form.Label>
-              <Form.Select
-                value={teacherPayment.status}
-                onChange={(e) => setTeacherPayment({
-                  ...teacherPayment,
-                  status: e.target.value
-                })}
-              >
-                <option value="completed">Complété</option>
-                <option value="pending">En attente</option>
-              </Form.Select>
-            </Form.Group>
-          </Col>
+                  <Col md={3}>
+                    <Form.Group className="mb-3">
+                      <Form.Label>Date</Form.Label>
+                      <Form.Control
+                        type="date"
+                        value={teacherPayment.date}
+                        onChange={(e) => setTeacherPayment({
+                          ...teacherPayment,
+                          date: e.target.value
+                        })}
+                        required
+                      />
+                    </Form.Group>
+                  </Col>
+                  <Col md={3}>
+                    <Form.Group className="mb-3">
+                      <Form.Label>Type</Form.Label>
+                      <Form.Select 
+                        value={teacherPayment.type}
+                        onChange={(e) => setTeacherPayment({
+                          ...teacherPayment,
+                          type: e.target.value
+                        })}
+                      >
+                        <option value="expense">Payé</option>
+                        <option value="payable">Non encore payé</option>
+                      </Form.Select>
+                    </Form.Group>
+                  </Col>
+                  <Col md={3}>
+                    <Form.Group className="mb-3">
+                      <Form.Label>Statut</Form.Label>
+                      <Form.Select
+                        value={teacherPayment.status}
+                        onChange={(e) => setTeacherPayment({
+                          ...teacherPayment,
+                          status: e.target.value
+                        })}
+                      >
+                        <option value="completed">Complété</option>
+                        <option value="pending">En attente</option>
+                      </Form.Select>
+                    </Form.Group>
+                  </Col>
                   <Col md={4}>
                     <Form.Group className="mb-3">
                       <Form.Label>Enseignant</Form.Label>
@@ -931,10 +802,11 @@ const handleEditSubmit = async (e, formData) => {
           </Card>
         </Tab>
       </Tabs>
- {/* Filter controls */}
+
+      {/* Filters and Search */}
       <Card className="mb-4">
         <Card.Body>
-          <Row>
+          <Row className="g-3">
             <Col md={3}>
               <Form.Group>
                 <Form.Label>Date de début</Form.Label>
@@ -957,56 +829,181 @@ const handleEditSubmit = async (e, formData) => {
             </Col>
             <Col md={3}>
               <Form.Group>
-                <Form.Label>Type</Form.Label>
+                <Form.Label>Type de transaction</Form.Label>
                 <Form.Select
-  value={filterType}
-  onChange={(e) => setFilterType(e.target.value)}
->
-  <option value="all">Tous</option>
-  <option value="income">Reçus</option>
-  <option value="receivable">Non encore reçus</option>
-  <option value="expense">Payés</option>
-  <option value="payable">Non encore payés</option>
-</Form.Select>
+                  value={filterType}
+                  onChange={(e) => setFilterType(e.target.value)}
+                >
+                  <option value="all">Tous les types</option>
+                  <option value="income">Reçus</option>
+                  <option value="expense">Payés</option>
+                  <option value="receivable">À recevoir</option>
+                  <option value="payable">À payer</option>
+                </Form.Select>
+              </Form.Group>
+            </Col>
+            <Col md={3}>
+              <Form.Group>
+                <Form.Label>Catégorie</Form.Label>
+                <Form.Select
+                  value={filterCategory}
+                  onChange={(e) => setFilterCategory(e.target.value)}
+                >
+                  <option value="all">Toutes les catégories</option>
+                  <option value="salary">Salaire</option>
+                  <option value="taxes">Taxes</option>
+                  <option value="classroom_rent">Location salle</option>
+                  <option value="student_payment">Paiement étudiant</option>
+                  <option value="teacher_share">Part enseignant</option>
+                  <option value="other">Autre</option>
+                </Form.Select>
+              </Form.Group>
+            </Col>
+            <Col md={6}>
+              <Form.Group>
+                <Form.Label>Recherche</Form.Label>
+                <InputGroup>
+                  <FormControl
+                    placeholder="Rechercher par description, enseignant, étudiant..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                  <Button variant="outline-secondary">
+                    <SearchIcon />
+                  </Button>
+                </InputGroup>
               </Form.Group>
             </Col>
             <Col md={3} className="d-flex align-items-end">
-              <Button variant="primary" onClick={fetchTransactions}>
-                Appliquer
+              <Button variant="primary" onClick={fetchTransactions} className="me-2">
+                Appliquer les filtres
+              </Button>
+              <Button variant="secondary" onClick={() => {
+                setFilterStartDate('');
+                setFilterEndDate('');
+                setFilterType('all');
+                setFilterCategory('all');
+                setSearchQuery('');
+                fetchTransactions();
+              }}>
+                Réinitialiser
               </Button>
             </Col>
           </Row>
         </Card.Body>
       </Card>
+
       {/* Transactions table */}
-      {loading ? (
-        <div className="text-center my-4">
-          <Spinner animation="border" />
-        </div>
-      ) : (
-        <>
-          {transactions.length === 0 ? (
+      <Card>
+        <Card.Body>
+          <Card.Title>Liste des Transactions</Card.Title>
+          
+          {loading ? (
+            <div className="text-center my-4">
+              <Spinner animation="border" />
+            </div>
+          ) : filteredTransactions.length === 0 ? (
             <Alert variant="info">Aucune transaction trouvée</Alert>
           ) : (
-            <MaterialReactTable
-              columns={columns}
-              data={transactions}
-              initialState={{ pagination }}
-              onPaginationChange={setPagination}
-              state={{ pagination }}
-              manualPagination={false}
-            />
+            <div className="table-responsive">
+              <table className="table table-striped table-hover">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Montant</th>
+                    <th>Description</th>
+                    <th>Catégorie</th>
+                    <th>Enseignant</th>
+                    <th>Étudiant</th>
+                    <th>Statut</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredTransactions.map((transaction) => {
+                    const typeDisplay = getTypeDisplay(transaction.type);
+                    return (
+                      <tr key={transaction.id}>
+                        <td>
+                          {new Date(transaction.date).toLocaleDateString('fr-FR')}
+                        </td>
+                        <td>
+                          <Typography color={typeDisplay.color}>
+                            {typeDisplay.text}
+                          </Typography>
+                        </td>
+                        <td>
+                          <strong>{parseFloat(transaction.amount).toFixed(2)} DT</strong>
+                        </td>
+                        <td>{transaction.description}</td>
+                        <td>{getCategoryDisplayName(transaction.category)}</td>
+                        <td>{transaction.teacher?.name || "-"}</td>
+                        <td>{transaction.student?.name || "-"}</td>
+                        <td>
+                          <span className={`badge ${transaction.status === 'completed' ? 'bg-success' : 'bg-warning'}`}>
+                            {transaction.status === 'completed' ? 'Complété' : 'En attente'}
+                          </span>
+                        </td>
+                        <td>
+                          <div className="d-flex gap-2">
+                            <IconButton 
+                              onClick={() => handleEdit(transaction)}
+                              color="primary"
+                              size="small"
+                            >
+                              <EditIcon />
+                            </IconButton>
+                            <IconButton 
+                              onClick={() => handleDelete(transaction.id)}
+                              color="error"
+                              size="small"
+                            >
+                              <DeleteForeverIcon />
+                            </IconButton>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           )}
-        </>
-      )}
+        </Card.Body>
+      </Card>
 
       {/* Totals card */}
       <Card className="mt-4">
         <Card.Body>
-          <Card.Title>Totaux</Card.Title>
-          <p>Total Reçus: {totals.income.toFixed(2)} DT</p>
-          <p>Total Payés: {totals.expenses.toFixed(2)} DT</p>
-          <p>Solde Net: {totals.balance.toFixed(2)} DT</p>
+          <Row>
+            <Col md={4}>
+              <Card className="bg-success bg-opacity-10 border-success">
+                <Card.Body>
+                  <Card.Title>Total Reçus</Card.Title>
+                  <h3 className="text-success">{totals.income.toFixed(2)} DT</h3>
+                </Card.Body>
+              </Card>
+            </Col>
+            <Col md={4}>
+              <Card className="bg-danger bg-opacity-10 border-danger">
+                <Card.Body>
+                  <Card.Title>Total Payés</Card.Title>
+                  <h3 className="text-danger">{totals.expenses.toFixed(2)} DT</h3>
+                </Card.Body>
+              </Card>
+            </Col>
+            <Col md={4}>
+              <Card className={`bg-${totals.balance >= 0 ? 'info' : 'warning'} bg-opacity-10 border-${totals.balance >= 0 ? 'info' : 'warning'}`}>
+                <Card.Body>
+                  <Card.Title>Solde Net</Card.Title>
+                  <h3 className={`text-${totals.balance >= 0 ? 'info' : 'warning'}`}>
+                    {totals.balance.toFixed(2)} DT
+                  </h3>
+                </Card.Body>
+              </Card>
+            </Col>
+          </Row>
         </Card.Body>
       </Card>
 
@@ -1018,23 +1015,22 @@ const handleEditSubmit = async (e, formData) => {
         <Modal.Body>
           {currentTransaction && (
             <Form onSubmit={(e) => handleSubmit(e, currentTransaction, true)}>
-                    <input type="hidden" name="id" value={currentTransaction.id} />
-
+              <input type="hidden" name="id" value={currentTransaction.id} />
               <Row>
-                    <Col md={3}>
-            <Form.Group className="mb-3">
-              <Form.Label>Date</Form.Label>
-              <Form.Control
-                type="date"
-                value={formatDateForInput(currentTransaction.date)}
-                onChange={(e) => setCurrentTransaction({
-                  ...currentTransaction,
-                  date: e.target.value
-                })}
-                required
-              />
-            </Form.Group>
-          </Col>
+                <Col md={3}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Date</Form.Label>
+                    <Form.Control
+                      type="date"
+                      value={formatDateForInput(currentTransaction.date)}
+                      onChange={(e) => setCurrentTransaction({
+                        ...currentTransaction,
+                        date: e.target.value
+                      })}
+                      required
+                    />
+                  </Form.Group>
+                </Col>
                 <Col md={4}>
                   <Form.Group className="mb-3">
                     <Form.Label>Type</Form.Label>
