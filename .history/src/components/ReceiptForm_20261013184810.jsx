@@ -23,7 +23,7 @@ const ReceiptForm =({ initialReceipt = null })=> {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [receipt, setReceipt] = useState({
     payerName: '',
-    payerAddress: '',
+    payerAddress: 'sfax',
     receiptNumber: 'RCP-000001',
     paymentDate: new Date().toISOString().split('T')[0],
     amount: 0,
@@ -491,7 +491,7 @@ const [loading, setLoading] = useState(true);
             <p className="mb-0 mt-2">{receipt.address}</p>
             <p className="mb-0">Tél: {receipt.phone}</p>
             <p className="mb-0">Email: {receipt.email}</p>
-            <p>Matricule Fiscale: {receipt.matricule}</p>
+            
           </div>
           <div className="text-end">
             <h2 className="mb-1">REÇU DE PAIEMENT</h2>
@@ -507,7 +507,7 @@ const [loading, setLoading] = useState(true);
               <p className="mb-1"><strong>{receipt.name}</strong></p>
               <p className="mb-0 text-muted">{receipt.address}</p>
               <p className="mb-0">Tél: {receipt.phone}</p>
-              <p className="mb-5">Matricule Fiscale: {receipt.matricule}</p>
+              
             </div>
           </div>
           <div className="col-md-6">

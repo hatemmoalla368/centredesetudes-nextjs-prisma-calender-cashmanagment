@@ -23,7 +23,7 @@ const ReceiptForm =({ initialReceipt = null })=> {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [receipt, setReceipt] = useState({
     payerName: '',
-    payerAddress: '',
+    payerAddress: 'sfax',
     receiptNumber: 'RCP-000001',
     paymentDate: new Date().toISOString().split('T')[0],
     amount: 0,

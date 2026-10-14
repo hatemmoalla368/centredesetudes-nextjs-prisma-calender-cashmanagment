@@ -75,7 +75,7 @@ const ReceiptsList = () => {
   const [nonReceiptedTransactions, setNonReceiptedTransactions] = useState([]);
   const [selectedTransaction, setSelectedTransaction] = useState(null);
   const [payerName, setPayerName] = useState('');
-  const [payerAddress, setPayerAddress] = useState('');
+  const [payerAddress, setPayerAddress] = useState('sfax');
   const [paymentDate, setPaymentDate] = useState(new Date().toISOString().split('T')[0]);
   const [amountInWords, setAmountInWords] = useState('');
   const [paymentDescription, setPaymentDescription] = useState('');
@@ -159,7 +159,7 @@ const ReceiptsList = () => {
   const handleOpenImportModal = () => {
     setShowImportModal(true);
     setPayerName('');
-    setPayerAddress('');
+    setPayerAddress('sfax');
     setPaymentDate(new Date().toISOString().split('T')[0]);
     setAmountInWords('');
     setPaymentDescription('');
@@ -173,7 +173,7 @@ const ReceiptsList = () => {
   const handleTransactionSelect = (transaction) => {
     setSelectedTransaction(transaction);
     setPayerName(transaction.student?.name || transaction.teacher?.name || '');
-    setPayerAddress('');
+    setPayerAddress('sfax');
     setPaymentDate(new Date(transaction.date).toISOString().split('T')[0]);
     setAmountInWords(numberToWordsFrench(Math.floor(transaction.amount)));
     setPaymentDescription(transaction.description || 'Paiement pour cours');
@@ -257,7 +257,7 @@ const ReceiptsList = () => {
           companyAddress: COMPANY_INFO.address,
           companyPhone: COMPANY_INFO.phone,
           companyEmail: COMPANY_INFO.email,
-          matriculeFiscale: COMPANY_INFO.matricule,
+          
         }),
       });
 
@@ -275,7 +275,7 @@ const ReceiptsList = () => {
       setShowImportModal(false);
       setSelectedTransaction(null);
       setPayerName('');
-      setPayerAddress('');
+      setPayerAddress('sfax');
       setPaymentDate(new Date().toISOString().split('T')[0]);
       setAmountInWords('');
       setPaymentDescription('');

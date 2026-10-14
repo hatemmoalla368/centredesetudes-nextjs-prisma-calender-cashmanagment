@@ -75,7 +75,7 @@ const ReceiptsList = () => {
   const [nonReceiptedTransactions, setNonReceiptedTransactions] = useState([]);
   const [selectedTransaction, setSelectedTransaction] = useState(null);
   const [payerName, setPayerName] = useState('');
-  const [payerAddress, setPayerAddress] = useState('');
+  const [payerAddress, setPayerAddress] = useState('sfax');
   const [paymentDate, setPaymentDate] = useState(new Date().toISOString().split('T')[0]);
   const [amountInWords, setAmountInWords] = useState('');
   const [paymentDescription, setPaymentDescription] = useState('');
